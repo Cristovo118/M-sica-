@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyric & Poem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Lora:ital@1&family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #09090B;
+            --card-bg: #18181B;
+            --primary: #8B5CF6;
+            --primary-hover: #7C3AED;
+            --text-main: #FAFAFA;
+            --text-muted: #A1A1AA;
+            --sidebar-bg: #09090B;
+            --danger: #EF4444;
+            --border-color: #27272A;
+            --blur-bg: rgba(9, 9, 11, 0.7);
+        }
+
+        .light-theme {
+            --bg-color: #F4F4F5;
+            --card-bg: #FFFFFF;
+            --primary: #8B5CF6;
+            --primary-hover: #7C3AED;
+            --text-main: #18181B;
+            --text-muted: #71717A;
+            --sidebar-bg: #FFFFFF;
+            --danger: #DC2626;
+            --border-color: #E4E4E7;
+            --blur-bg: rgba(244, 244, 245, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container simulando a tela de um celular no Desktop */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 20px;
+            position: sticky;
+            top: 0;
+            background: var(--blur-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .view {
+            display: none;
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+            padding-bottom: 120px;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-cards {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dash-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .dash-card i {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 16px;
+            border-radius: 50%;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-item {
+            background-color: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease;
+        }
+
+        .list-item:hover { transform: scale(1.02); }
+
+        .list-info h4 { margin-bottom: 4px; font-weight: 500; font-size: 16px; }
+        .list-info p { font-size: 13px; color: var(--text-muted); }
+
+        .list-actions {
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            font-size: 18px;
+        }
+        
+        .list-actions i { cursor: pointer; padding: 8px; transition: color 0.2s; }
+        .list-actions i:hover { color: var(--text-main); }
+
+        /* BOTOES */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #a78bfa);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .btn-primary:active { transform: scale(0.98); }
+
+        /* SIDEBAR */
+        .sidebar-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 120; display: none; opacity: 0; transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+        
+        .sidebar {
+            position: absolute; top: 0; left: -320px; width: 280px; height: 100%;
+            background-color: var(--sidebar-bg); z-index: 130; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; padding: 24px;
+            border-right: 1px solid var(--border-color);
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .sidebar-item {
+            padding: 16px; border-radius: 12px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 16px;
+            color: var(--text-main); cursor: pointer; font-weight: 500;
+            transition: background 0.2s;
+        }
+        .sidebar-item:hover { background: var(--card-bg); }
+        .sidebar-item i { color: var(--primary); width: 24px; font-size: 18px; text-align: center; }
+
+        /* CONFIGURAÇÕES TELA */
+        .config-group {
+            background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 16px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            border: 1px solid var(--border-color); transition: transform 0.2s;
+        }
+        .config-group:hover { transform: scale(1.02); }
+        .config-info h4 { margin-bottom: 6px; font-weight: 500; }
+        .config-info p { font-size: 13px; color: var(--text-muted); }
+
+        /* BOTTOM SHEETS */
+        .bottom-sheet-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 100; display: none; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .bottom-sheet-overlay.active { display: block; opacity: 1; }
+        
+        .bottom-sheet {
+            position: absolute; bottom: -100%; left: 0; width: 100%;
+            background-color: var(--card-bg); border-radius: 24px 24px 0 0; padding: 24px;
+            z-index: 101; transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 80%; overflow-y: auto; border-top: 1px solid var(--border-color);
+        }
+        .bottom-sheet.active { bottom: 0; }
+        .sheet-handle { width: 48px; height: 5px; background: var(--border-color); border-radius: 3px; margin: 0 auto 24px auto; }
+        .sheet-title { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .sheet-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; border-radius: 12px;
+            color: var(--text-main); font-size: 16px; font-weight: 500;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .sheet-item:hover { background: var(--bg-color); }
+        .sheet-item i { color: var(--primary); width: 24px; text-align: center; font-size: 18px; }
+        .sheet-item.danger-action { color: var(--danger); }
+        .sheet-item.danger-action i { color: var(--danger); }
+
+        /* POPUP CENTRAL */
+        .center-popup-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 150; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .center-popup-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+        .center-popup {
+            background-color: var(--card-bg); border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 340px;
+            border: 1px solid var(--border-color); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .center-popup-icon { font-size: 42px; color: var(--primary); margin-bottom: 20px; }
+        .center-popup-icon.danger { color: var(--danger); }
+        .center-popup-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+        .center-popup-body { font-family: 'Lora', serif; font-style: italic; font-size: 16px; line-height: 1.6; color: var(--text-muted); margin-bottom: 24px; }
+        .center-popup-actions { display: flex; gap: 12px; }
+        .center-popup-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 600; font-size: 15px; cursor: pointer; transition: opacity 0.2s; }
+        .center-popup-btn:active { opacity: 0.8; }
+        .center-popup-btn.close { background: var(--border-color); color: var(--text-main); }
+        .center-popup-btn.action { background: var(--primary); color: white; }
+        .center-popup-btn.danger-btn { background: var(--danger); color: white; }
+
+        /* TOAST */
+        .toast-notification {
+            position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+            background: var(--text-main); color: var(--bg-color);
+            padding: 14px 24px; border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 14px; font-weight: 600; z-index: 200;
+            display: flex; align-items: center; gap: 12px;
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+        }
+        .toast-notification.active { top: 40px; }
+        .toast-notification i { color: var(--primary); font-size: 18px; }
+
+        /* INSPIRAÇÕES */
+        .insp-bubble-container { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+        .insp-bubble {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary);
+            padding: 20px; border-radius: 16px;
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        .insp-bubble:hover { transform: translateX(5px); }
+        .insp-bubble-header { display: flex; align-items: center; gap: 10px; font-size: 12px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 12px; }
+        .insp-bubble.quote .insp-bubble-header { color: #F59E0B; }
+        .insp-bubble.excerpt .insp-bubble-header { color: #10B981; }
+        .insp-bubble.idea .insp-bubble-header { color: #3B82F6; }
+        .insp-bubble-body { font-family: 'Lora', serif; font-style: italic; font-size: 15px; line-height: 1.5; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* EDITOR */
+        .editor-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 20px; margin-bottom: 24px;}
+        .editor-header i { font-size: 20px; cursor: pointer; padding: 8px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); }
+        .editor-title { background: transparent; border: none; color: var(--text-main); font-size: 28px; font-weight: 600; width: 100%; outline: none; margin-bottom: 16px; font-family: 'Playfair Display', serif;}
+        .editor-title::placeholder { color: var(--text-muted); }
+        
+        .editor-textarea { width: 100%; height: 45vh; background: transparent; border: none; color: var(--text-main); resize: none; outline: none; font-size: 18px; line-height: 1.6; font-family: 'Lora', serif; }
+        .editor-textarea::placeholder { color: var(--border-color); }
+
+        .filter-scroll { display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .filter-scroll::-webkit-scrollbar { display: none; }
+        .filter-chip { background: var(--card-bg); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; color: var(--text-muted); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+
+        .media-preview-container { display: flex; gap: 12px; margin: 16px 0; overflow-x: auto; align-items: center;}
+        .img-preview { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color); }
+        .audio-preview-badge { background: var(--card-bg); padding: 8px 16px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); }
+
+        /* CONTROLES EDITOR */
+        .editor-bottom-controls {
+            position: absolute; bottom: 80px; left: 0; width: 100%;
+            background: linear-gradient(to top, var(--bg-color) 70%, transparent);
+            z-index: 15; display: none; flex-direction: column; padding: 20px 20px 0 20px;
+        }
+        .app-container:has(#view-editor.active) .editor-bottom-controls { display: flex; }
+
+        .editor-toolbar { display: flex; justify-content: space-between; padding: 16px 20px; border-radius: 20px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-muted); overflow-x: auto; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); scrollbar-width: none;}
+        .editor-toolbar::-webkit-scrollbar { display: none; }
+        .editor-toolbar i { cursor: pointer; font-size: 18px; transition: color 0.2s; }
+        .editor-toolbar i:hover { color: var(--primary); }
+
+        .editor-submenu { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 16px; display: none; flex-direction: column; gap: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 20px rgba(0,0,0,0.2);}
+        .submenu-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+        .submenu-options { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .submenu-options::-webkit-scrollbar { display: none; }
+        .submenu-btn { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+        .submenu-btn:hover { background: var(--border-color); }
+
+        .chords-rack { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0; width: 100%; scrollbar-width: none; }
+        .chords-rack::-webkit-scrollbar { display: none; }
+        .chord-pill { background: var(--bg-color); color: var(--text-main); padding: 10px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid var(--border-color); transition: all 0.2s; }
+        .chord-pill:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* NAV INFERIOR */
+        .bottom-nav {
+            position: absolute; bottom: 0; width: 100%;
+            background: var(--blur-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-color); display: flex; justify-content: space-around;
+            padding: 16px 0 24px 0; z-index: 10;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 12px; font-weight: 500; gap: 6px; cursor: pointer; transition: color 0.2s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; transition: transform 0.2s; }
+        .nav-item.active i { transform: translateY(-3px); }
+
+        /* FOCUS MODE */
+        .focus-mode header, .focus-mode .bottom-nav, .focus-mode .editor-header, .focus-mode .filter-scroll, .focus-mode .editor-bottom-controls, .focus-mode .editor-submenu { display: none !important; }
+        .focus-mode .editor-textarea { height: 90vh !important; margin-top: 40px; }
+        .focus-overlay-exit { position: absolute; top: 20px; right: 20px; background: rgba(139, 92, 246, 0.2); color: var(--primary); padding: 12px; border-radius: 50%; cursor: pointer; display: none; z-index: 99; backdrop-filter: blur(4px); }
+        .focus-mode .focus-overlay-exit { display: block; }
+        
+        .recording-pulse { display: inline-block; width: 12px; height: 12px; background: #EF4444; border-radius: 50%; animation: pulse 1s infinite; margin-right: 8px; }
+        @keyframes pulse { 0% { transform: scale(0.8); opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.8); opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="appContainer">
+        <div class="focus-overlay-exit" onclick="exitFocusMode()"><i class="fa-solid fa-eye-slash"></i></div>
+
+        <input type="file" id="imageFileInput" accept="image/*" style="display: none;" onchange="imageSelected(this)">
+
+        <div class="toast-notification" id="toastBox">
+            <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+            <span id="toastMessage">Notificação</span>
+        </div>
+
+        <div class="center-popup-overlay" id="inspirationPopupOverlay">
+            <div class="center-popup">
+                <div class="center-popup-icon" id="popIconContainer"><i class="fa-regular fa-lightbulb"></i></div>
+                <div class="center-popup-title" id="popInspirationTitle">Insight</div>
+                <div class="center-popup-body" id="popInspirationBody">"Texto da inspiração..."</div>
+                <div class="center-popup-actions" id="popActionButtons">
+                    <button class="center-popup-btn close" onclick="closeInspirationPopup()">Fechar</button>
+                    <button class="center-popup-btn action" onclick="copyInspirationContent()">Copiar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Lyric<span>&</span>Poem</div>
+                <i class="fa-solid fa-xmark" onclick="toggleSidebar()" style="cursor: pointer; font-size: 24px;"></i>
+            </div>
+            <div class="sidebar-item" onclick="toggleSidebar(); switchView('view-config')"><i class="fa-solid fa-gear"></i> Configurações</div>
+            <div class="sidebar-item" onclick="toggleSidebar(); switchView('view-private')"><i class="fa-solid fa-lock"></i> Área Privada</div>
+        </div>
+
+        <div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+        <div class="bottom-sheet" id="globalBottomSheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title" id="globalSheetTitle">Opções</div>
+            <div id="globalSheetContent"></div>
+        </div>
+
+        <div id="view-home" class="view active">
+            <header>
+                <i class="fa-solid fa-bars" onclick="toggleSidebar()" style="cursor: pointer; font-size: 22px;"></i>
+                <div class="logo">Lyric<span>&</span>Poem</div>
+                <i class="fa-regular fa-bell" onclick="showNotification('Tudo atualizado por aqui!')" style="cursor: pointer; font-size: 22px;"></i>
+            </header>
+            
+            <div class="dashboard-cards">
+                <div class="dash-card" onclick="switchNav(document.querySelectorAll('.nav-item')[1], 'view-poems')">
+                    <i class="fa-solid fa-feather-pointed"></i>
+                    <h3>Poemas</h3>
+                </div>
+                <div class="dash-card" onclick="switchNav(document.querySelectorAll('.nav-item')[2], 'view-music')">
+                    <i class="fa-solid fa-guitar"></i>
+                    <h3>Músicas</h3>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="openNewEditor()">
+                <i class="fa-solid fa-pen-nib"></i> Começar a escrever
+            </button>
+
+            <div class="section-title">Textos Recentes</div>
+            <div class="list-container" id="home-list"></div>
+        </div>
+
+        <div id="view-poems" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchNav(document.querySelectorAll('.nav-item')[0], 'view-home')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Poemas</div>
+                <i class="fa-solid fa-plus" onclick="openNewEditor()" style="cursor: pointer; font-size: 20px; color: var(--primary);"></i>
+            </header>
+            <div class="list-container" id="poems-list"></div>
+        </div>
+
+        <div id="view-music" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchNav(document.querySelectorAll('.nav-item')[0], 'view-home')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Músicas</div>
+                <i class="fa-solid fa-plus" onclick="openNewEditor()" style="cursor: pointer; font-size: 20px; color: var(--primary);"></i>
+            </header>
+            <div class="list-container" id="music-list"></div>
+        </div>
+        
+        <div id="view-favorites" class="view">
+            <header><div class="logo">Favoritos</div></header>
+            <div class="list-container" id="favorites-list"></div>
+        </div>
+
+        <div id="view-inspirations" class="view">
+            <header><div class="logo">Inspirações</div></header>
+            <div class="insp-bubble-container">
+                <div class="insp-bubble quote" onclick="openRandomInspiration('quote')">
+                    <div class="insp-bubble-header"><i class="fa-solid fa-quote-left"></i> Citação Poética</div>
+                    <div class="insp-bubble-body" id="insp-quote-body">"Toque para gerar uma citação poética..."</div>
+                </div>
+                <div class="insp-bubble excerpt" onclick="openRandomInspiration('verse')">
+                    <div class="insp-bubble-header"><i class="fa-solid fa-book-bookmark"></i> Versículo</div>
+                    <div class="insp-bubble-body" id="insp-verse-body">"Toque para gerar um versículo..."</div>
+                </div>
+                <div class="insp-bubble idea" onclick="openRandomInspiration('idea')">
+                    <div class="insp-bubble-header"><i class="fa-regular fa-lightbulb"></i> Ideia Criativa</div>
+                    <div class="insp-bubble-body" id="insp-idea-body">"Toque para gerar um gatilho de escrita..."</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-config" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchView('view-home')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Ajustes</div>
+                <div></div>
+            </header>
+            <div class="config-group" onclick="toggleAppTheme()">
+                <div class="config-info">
+                    <h4>Tema Visual</h4>
+                    <p>Alterne entre os modos Claro e Escuro.</p>
+                </div>
+                <i class="fa-solid fa-circle-half-stroke" style="color: var(--primary); font-size: 24px;"></i>
+            </div>
+            <div class="config-group" onclick="switchView('view-history-log')">
+                <div class="config-info">
+                    <h4>Histórico do Sistema</h4>
+                    <p>Veja tudo que foi modificado no app.</p>
+                </div>
+                <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); font-size: 24px;"></i>
+            </div>
+            <div class="config-group" onclick="switchView('view-trash')">
+                <div class="config-info">
+                    <h4>Lixeira</h4>
+                    <p>Recupere ou apague textos excluídos.</p>
+                </div>
+                <i class="fa-solid fa-trash-can" style="color: var(--danger); font-size: 24px;"></i>
+            </div>
+        </div>
+
+        <div id="view-history-log" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchView('view-config')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Histórico</div>
+                <div></div>
+            </header>
+            <div class="list-container" id="history-log-list"></div>
+        </div>
+
+        <div id="view-trash" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchView('view-config')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Lixeira</div>
+                <div></div>
+            </header>
+            <div class="list-container" id="trash-list"></div>
+        </div>
+
+        <div id="view-private" class="view">
+            <header>
+                <i class="fa-solid fa-arrow-left" onclick="switchView('view-home')" style="cursor: pointer; font-size: 20px;"></i>
+                <div class="logo">Área Privada</div>
+                <i class="fa-solid fa-shield-halved" style="color: var(--primary); font-size: 20px;"></i>
+            </header>
+            <div class="section-title">Arquivos Protegidos</div>
+            <div class="list-container" id="private-list"></div>
+        </div>
+
+        <div id="view-editor" class="view">
+            <div class="editor-header">
+                <i class="fa-solid fa-arrow-left" onclick="saveCurrentText(); switchView('view-home');"></i>
+                <div style="display: flex; gap: 12px;">
+                    <i class="fa-regular fa-trash-can" onclick="askDeleteConfirmation()" style="color: var(--danger);"></i>
+                    <i class="fa-solid fa-ellipsis" id="editorThreeDots" onclick="openMenuContextFromEditor()"></i>
+                </div>
+            </div>
+            
+            <input type="text" id="editTitle" class="editor-title" placeholder="Título da Obra">
+            
+            <div class="filter-scroll">
+                <span class="filter-chip" id="chip-category" onclick="openCategorySheet()"><i class="fa-solid fa-tag"></i> Categoria: Geral</span>
+                <span class="filter-chip" id="chip-emotion" onclick="openEmotionSheet()"><i class="fa-regular fa-face-smile"></i> Mood: Nenhum</span>
+            </div>
+
+            <div class="media-preview-container" id="mediaPreviewArea"></div>
+
+            <textarea id="editTextarea" class="editor-textarea" placeholder="Deixe as palavras fluírem aqui..." oninput="pushState()"></textarea>
+
+            <div class="editor-bottom-controls">
+                <div id="submenu-text" class="editor-submenu">
+                    <div class="submenu-title">Estilo e Letras</div>
+                    <div class="submenu-options">
+                        <button class="submenu-btn" onclick="openFontSizeListSheet()">Tamanho</button>
+                        <button class="submenu-btn" onclick="openFontTypeListSheet()">Trocar Fonte</button>
+                    </div>
+                </div>
+
+                <div id="submenu-align" class="editor-submenu">
+                    <div class="submenu-title">Alinhamento</div>
+                    <div class="submenu-options">
+                        <button class="submenu-btn" onclick="alignText('left')">Esquerda</button>
+                        <button class="submenu-btn" onclick="alignText('center')">Centro</button>
+                        <button class="submenu-btn" onclick="alignText('right')">Direita</button>
+                    </div>
+                </div>
+
+                <div id="submenu-list" class="editor-submenu">
+                    <div class="submenu-title">Listas</div>
+                    <div class="submenu-options">
+                        <button class="submenu-btn" onclick="insertList('* ')">Marcadores</button>
+                        <button class="submenu-btn" onclick="insertList('1. ')">Numerada</button>
+                    </div>
+                </div>
+
+                <div id="submenu-music" class="editor-submenu">
+                    <div class="submenu-title">Acordes Rápidos</div>
+                    <div class="chords-rack">
+                        <button class="chord-pill" onclick="insertChord('[C]')">C</button>
+                        <button class="chord-pill" onclick="insertChord('[D]')">D</button>
+                        <button class="chord-pill" onclick="insertChord('[E]')">E</button>
+                        <button class="chord-pill" onclick="insertChord('[F]')">F</button>
+                        <button class="chord-pill" onclick="insertChord('[G]')">G</button>
+                        <button class="chord-pill" onclick="insertChord('[A]')">A</button>
+                        <button class="chord-pill" onclick="insertChord('[B]')">B</button>
+                    </div>
+                </div>
+
+                <div id="submenu-mic" class="editor-submenu">
+                    <div class="submenu-title" id="mic-status">Gravador de Voz</div>
+                    <div class="submenu-options">
+                        <button class="submenu-btn" id="btnRecordAudio" onclick="handleAudioRecording()" style="color: var(--danger); border-color: var(--danger);"><i class="fa-solid fa-microphone"></i> Gravar Ideia de Áudio</button>
+                    </div>
+                </div>
+
+                <div class="editor-toolbar">
+                    <i class="fa-solid fa-font" onclick="toggleSubmenu('submenu-text')"></i>
+                    <i class="fa-solid fa-bold" onclick="toggleBold()"></i>
+                    <i class="fa-solid fa-italic" onclick="toggleItalic()"></i>
+                    <i class="fa-solid fa-align-left" onclick="toggleSubmenu('submenu-align')"></i>
+                    <i class="fa-solid fa-music" onclick="toggleSubmenu('submenu-music')"></i>
+                    <i class="fa-regular fa-image" onclick="document.getElementById('imageFileInput').click()"></i>
+                    <i class="fa-solid fa-microphone" onclick="toggleSubmenu('submenu-mic')"></i>
+                    <i class="fa-solid fa-rotate-left" onclick="undoAction()" title="Desfazer"></i>
+                    <i class="fa-solid fa-expand" onclick="enterFocusMode()"></i>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchNav(this, 'view-home')"><i class="fa-solid fa-house"></i><span>Início</span></div>
+            <div class="nav-item" onclick="switchNav(this, 'view-poems')"><i class="fa-solid fa-feather"></i><span>Poemas</span></div>
+            <div class="nav-item" onclick="switchNav(this, 'view-music')"><i class="fa-solid fa-guitar"></i><span>Músicas</span></div>
+            <div class="nav-item" onclick="switchNav(this, 'view-favorites')"><i class="fa-regular fa-heart"></i><span>Favoritos</span></div>
+            <div class="nav-item" onclick="switchNav(this, 'view-inspirations')"><i class="fa-regular fa-lightbulb"></i><span>Ideias</span></div>
+        </nav>
+    </div>
+
+    <script>
+        let items = JSON.parse(localStorage.getItem('lyric_poem_data')) || [
+            { id: 1, title: "Enquanto a noite cai", content: "Versos da noite devagar...", type: "Poema", category: "Reflexão", emotion: "Melancolia", favorite: true, password: null },
+            { id: 2, title: "Sobre nós", content: "Letras de música marcantes.", type: "Música", category: "Romance", emotion: "Feliz", favorite: false, password: null }
+        ];
+
+        let trashItems = JSON.parse(localStorage.getItem('lyric_poem_trash')) || [];
+        let logs = JSON.parse(localStorage.getItem('lyric_poem_logs')) || [
+            { text: "Sistema iniciado com sucesso.", date: "Agora" }
+        ];
+
+        let categories = ["Reflexão", "Romance", "Letra Musical", "Pop/Rock"];
+        let emotions = ["Melancolia", "Feliz", "Nostalgia", "Inspirado"];
+
+        let currentId = null;
+        let selectedItemIdForMenu = null;
+        
+        let undoStack = [];
+        let redoStack = [];
+        let blockHistoryPush = false;
+
+        let mediaRecorder;
+        let isRecording = false;
+        let audioChunks = []; 
+        let selectedInspirationText = "";
+        const textarea = document.getElementById('editTextarea');
+
+        const versesList = [
+            "O Senhor é o meu pastor; de nada me terei falta. (Salmos 23:1)",
+            "Tudo posso naquele que me fortalece. (Filipenses 4:13)",
+            "Entrega o teu caminho ao Senhor; confia nele, e ele o fará. (Salmos 37:5)",
+            "Deus é o nosso refúgio e fortaleza, socorro bem presente na angústia. (Salmos 46:1)",
+            "O choro pode durar uma noite, mas a alegria vem pela manhã. (Salmos 30:5)",
+            "Porque sou eu que conheço os planos que tenho para vocês... (Jeremias 29:11)",
+            "Ame o Senhor, o seu Deus de todo o seu coração... (Marcos 12:30)",
+            "Mas os que esperam no Senhor renovarão as forças... (Isaías 40:31)",
+            "Sejam fortes e corajosos. Não tenham medo... (Deuteronômio 31:6)",
+            "O Senhor te abençoe e te guarde. (Números 6:24)",
+            "Busquem, pois, em primeiro lugar o Reino de Deus... (Mateus 6:33)",
+            "Alegrem-se na esperança, sejam pacientes na tribulação... (Romanos 12:12)",
+            "Lancem sobre ele toda a sua ansiedade, porque ele tem cuidado de vocês. (1 Pedro 5:7)",
+            "Pois onde estiver o seu tesouro, aí também estará o seu coração. (Mateus 6:21)",
+            "Aquele que habita no abrigo do Altíssimo e descansa à sombra do Todo-poderoso. (Salmos 91:1)",
+            "Respondeu Jesus: Eu sou o caminho, a verdade e a vida. (João 14:6)",
+            "Porque Deus amou o mundo de tal maneira... (João 3:16)",
+            "O amor é paciente, o amor é bondoso. Não inveja, não se vangloria... (1 Coríntios 13:4)",
+            "Nisto conhecemos o que é o amor: Jesus Cristo deu a sua vida por nós. (1 João 3:16)",
+            "Mil cairão ao teu lado, e dez mil à tua direita, mas tu não serás atingido. (Salmos 91:7)"
+        ];
+
+        const quotesList = [
+            "As estrelas parecem pequenos furos no teto escuro da solidão.",
+            "A saudade é a nossa alma dizendo para onde ela quer voltar.",
+            "Tudo o que temos de decidir é o que fazer com o tempo que nos é dado.",
+            "E no meio do inverno, aprendi que havia em mim um verão invencível.",
+            "As palavras são, na minha não tão humilde opinião, nossa inesgotável fonte de magia.",
+            "A poesia não é um luxo. É uma necessidade vital da nossa existência.",
+            "Amar é mudar a alma de casa.",
+            "Tudo vale a pena se a alma não é pequena.",
+            "A arte lava da alma a poeira da vida cotidiana.",
+            "Há mar e mar, há ir e voltar.",
+            "Quem olha para fora, sonha; quem olha para dentro, desperta.",
+            "Nós somos feitos do mesmo tecido que os nossos sonhos.",
+            "O correr da vida embrulha tudo. A vida é assim: esquenta e esfria, aperta e daí afrouxa.",
+            "Para viajar basta existir.",
+            "A única verdadeira viagem de descobrimento consiste em ter novos olhos.",
+            "A beleza salvará o mundo.",
+            "O essencial é invisível aos olhos.",
+            "Sou um guardador de rebanhos. O rebanho é os meus pensamentos.",
+            "Há quem me julgue perdido, porque ando a ouvir estrelas.",
+            "Renda-se, como eu me rendi. Mergulhe no que você não conhece como eu mergulhei."
+        ];
+
+        const ideasList = [
+            "Acordei pensando no som do vento batendo na janela daquela antiga casa.",
+            "Descreva o sentimento de segurar uma xícara de café quente em uma manhã fria.",
+            "A sensação de encontrar um bilhete esquecido dentro de um livro velho.",
+            "Escreva sobre as luzes da cidade refletidas no asfalto molhado após a chuva.",
+            "Uma conversa silenciosa através de olhares em uma estação de trem.",
+            "O momento em que a última folha de outono cai da árvore.",
+            "Descreva a textura e o cheiro do mar na primeira vez que alguém o vê.",
+            "O som de passos ecoando em um corredor vazio à meia-noite.",
+            "A nostalgia de ouvir uma música antiga no rádio de um carro em movimento.",
+            "Escreva sobre o espaço vazio deixado na estante após doar um livro favorito.",
+            "A poeira dançando no único raio de sol que entra pela fresta da cortina.",
+            "A sensação de calçar meias quentes depois de andar na chuva.",
+            "Imagine que os relógios do mundo inteiro pararam por 1 minuto.",
+            "Descreva o gosto da primeira fruta da estação.",
+            "Aquele instante de hesitação antes de bater em uma porta fechada.",
+            "Um piano tocando sozinho em uma sala abandonada.",
+            "A sombra das nuvens se movendo rapidamente sobre uma montanha.",
+            "O silêncio confortável entre duas pessoas que não precisam de palavras.",
+            "A respiração ofegante depois de correr sem rumo pela rua vazia.",
+            "Escreva sobre o reflexo de um rosto mudando em um espelho embaçado."
+        ];
+
+        function openRandomInspiration(type) {
+            let title = "";
+            let content = "";
+            
+            if(type === 'quote') {
+                title = 'Citação Poética';
+                content = quotesList[Math.floor(Math.random() * quotesList.length)];
+                document.getElementById('insp-quote-body').innerText = `"${content}"`;
+            } else if (type === 'verse') {
+                title = 'Versículo Bíblico';
+                content = versesList[Math.floor(Math.random() * versesList.length)];
+                document.getElementById('insp-verse-body').innerText = `"${content}"`;
+            } else if (type === 'idea') {
+                title = 'Ideia Concreta';
+                content = ideasList[Math.floor(Math.random() * ideasList.length)];
+                document.getElementById('insp-idea-body').innerText = `"${content}"`;
+            }
+            
+            triggerInspirationPopup(title, content);
+        }
+
+        function addLog(actionText) {
+            logs.unshift({ text: actionText, date: new Date().toLocaleTimeString('pt-BR') });
+            localStorage.setItem('lyric_poem_logs', JSON.stringify(logs));
+            renderLogsList();
+        }
+
+        function showNotification(message, iconClass = "fa-circle-check") {
+            const toast = document.getElementById('toastBox');
+            const icon = document.getElementById('toastIcon');
+            const msgSpan = document.getElementById('toastMessage');
+            icon.className = `fa-solid ${iconClass}`;
+            msgSpan.innerText = message;
+            toast.classList.add('active');
+            setTimeout(() => { toast.classList.remove('active'); }, 2500);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function toggleAppTheme() {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            addLog(`Tema alterado para Modo ${isLight ? 'Claro' : 'Escuro'}`);
+            showNotification(isLight ? "Modo Claro Ativo!" : "Modo Escuro Ativo!", isLight ? "fa-sun" : "fa-moon");
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('lyric_poem_data', JSON.stringify(items));
+            localStorage.setItem('lyric_poem_trash', JSON.stringify(trashItems));
+            renderLists();
+            renderTrashList();
+        }
+
+        function renderLists() {
+            const containers = {
+                home: document.getElementById('home-list'),
+                poems: document.getElementById('poems-list'),
+                music: document.getElementById('music-list'),
+                favs: document.getElementById('favorites-list'),
+                private: document.getElementById('private-list')
+            };
+
+            Object.values(containers).forEach(c => { if(c) c.innerHTML = ""; });
+
+            items.forEach(item => {
+                const isLocked = item.password ? true : false;
+                const html = `
+                    <div class="list-item">
+                        <div class="list-info" onclick="tryOpenLockedEditor(${item.id})">
+                            <h4>${isLocked ? '🔒 Conteúdo Privado' : (item.title || 'Sem título')}</h4>
+                            <p>${isLocked ? 'Protegido na Central' : `${item.type} • ${item.category || 'Geral'} • Mood: ${item.emotion || 'Neutro'}`}</p>
+                        </div>
+                        <div class="list-actions">
+                            <i class="${item.favorite ? 'fa-solid fa-star' : 'fa-regular fa-star'}" style="color: ${item.favorite ? '#FBBF24' : 'var(--text-muted)'}" onclick="toggleFavorite(${item.id})"></i>
+                            <i class="fa-solid fa-ellipsis" onclick="openMenuContext(${item.id}, '${item.title}')"></i>
+                        </div>
+                    </div>`;
+
+                if(!isLocked && containers.home) containers.home.insertAdjacentHTML('beforeend', html);
+                if(!isLocked && item.type === "Poema" && containers.poems) containers.poems.insertAdjacentHTML('beforeend', html);
+                if(!isLocked && item.type === "Música" && containers.music) containers.music.insertAdjacentHTML('beforeend', html);
+                if(!isLocked && item.favorite && containers.favs) containers.favs.insertAdjacentHTML('beforeend', html);
+                if(isLocked && containers.private) containers.private.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderTrashList() {
+            const container = document.getElementById('trash-list');
+            if(!container) return;
+            container.innerHTML = "";
+            if(trashItems.length === 0) {
+                container.innerHTML = "<p style='color: var(--text-muted); text-align: center; margin-top: 20px;'>A lixeira está vazia.</p>";
+                return;
+            }
+            trashItems.forEach(item => {
+                container.innerHTML += `
+                    <div class="list-item">
+                        <div class="list-info">
+                            <h4>${item.title || 'Sem título'}</h4>
+                            <p>Excluído do tipo: ${item.type}</p>
+                        </div>
+                        <div class="list-actions">
+                            <i class="fa-solid fa-trash-arrow-up" title="Restaurar" onclick="restoreFromTrash(${item.id})"></i>
+                            <i class="fa-solid fa-circle-xmark" title="Deletar Definitivo" style="color: var(--danger);" onclick="deletePermanentFromTrash(${item.id})"></i>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function renderLogsList() {
+            const container = document.getElementById('history-log-list');
+            if(!container) return;
+            container.innerHTML = logs.map(l => `
+                <div class="list-item" style="cursor: default;">
+                    <div class="list-info">
+                        <h4>${l.text}</h4>
+                        <p>Horário registrado: ${l.date}</p>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function openSheet(title, htmlContent) {
+            document.getElementById('globalSheetTitle').innerText = title;
+            document.getElementById('globalSheetContent').innerHTML = htmlContent;
+            document.getElementById('sheetOverlay').classList.add('active');
+            document.getElementById('globalBottomSheet').classList.add('active');
+        }
+
+        function closeSheet() {
+            document.getElementById('sheetOverlay').classList.remove('active');
+            document.getElementById('globalBottomSheet').classList.remove('active');
+        }
+
+        function openMenuContext(id, title) {
+            selectedItemIdForMenu = id;
+            const item = items.find(i => i.id === id);
+            const lockText = item.password ? "Remover Proteção" : "Proteger com Senha";
+            
+            const html = `
+                <div class="sheet-item" onclick="handleSheetAction('edit')"><i class="fa-solid fa-pen-to-square"></i> Editar Rascunho</div>
+                <div class="sheet-item" onclick="handleSheetAction('poema')"><i class="fa-solid fa-feather"></i> Mudar para Poema</div>
+                <div class="sheet-item" onclick="handleSheetAction('musica')"><i class="fa-solid fa-guitar"></i> Mudar para Música</div>
+                <div class="sheet-item" onclick="handleSheetAction('toggle-lock')"><i class="fa-solid fa-user-shield"></i> ${lockText}</div>
+                <div class="sheet-item danger-action" onclick="handleSheetAction('delete')"><i class="fa-solid fa-trash-can"></i> Excluir Rascunho</div>
+            `;
+            openSheet(`Opções: "${title || 'Sem título'}"`, html);
+        }
+
+        function openMenuContextFromEditor() {
+            if(currentId) {
+                const currentItem = items.find(i => i.id === currentId);
+                openMenuContext(currentId, currentItem ? currentItem.title : "Este Texto");
+            }
+        }
+
+        function handleSheetAction(action) {
+            const id = selectedItemIdForMenu;
+            closeSheet();
+            if (!id) return;
+            const idx = items.findIndex(i => i.id === id);
+
+            if (action === 'edit') {
+                tryOpenLockedEditor(id);
+            } else if (action === 'poema') {
+                if(idx > -1) { items[idx].type = "Poema"; addLog(`Alterou tipo de "${items[idx].title}" para Poema`); saveToStorage(); showNotification("Alterado para Poema!"); }
+            } else if (action === 'musica') {
+                if(idx > -1) { items[idx].type = "Música"; addLog(`Alterou tipo de "${items[idx].title}" para Música`); saveToStorage(); showNotification("Alterado para Música!"); }
+            } else if (action === 'toggle-lock') {
+                if(items[idx].password) {
+                    let pass = prompt("Digite a senha atual para remover a tranca:");
+                    if(pass === items[idx].password) {
+                        addLog(`Removeu a tranca do arquivo "${items[idx].title}"`);
+                        items[idx].password = null;
+                        saveToStorage();
+                        showNotification("Item retornado à lista pública!");
+                        switchView('view-home');
+                    } else { alert("Senha incorreta."); }
+                } else {
+                    let newPass = prompt("Defina uma senha numérica ou de texto para proteger este arquivo:");
+                    if(newPass) {
+                        items[idx].password = newPass;
+                        addLog(`Trancou e protegeu o arquivo "${items[idx].title}"`);
+                        saveToStorage();
+                        showNotification("Movido para a Área Privada!", "fa-lock");
+                        switchView('view-home');
+                    }
+                }
+            } else if (action === 'delete') {
+                selectedItemIdForMenu = id;
+                askDeleteConfirmation();
+            }
+        }
+
+        function tryOpenLockedEditor(id) {
+            const item = items.find(i => i.id === id);
+            if(!item) return;
+            if(item.password) {
+                let check = prompt("Este arquivo está sob proteção. Digite a senha para abrir:");
+                if(check === item.password) { openEditor(id); } else { alert("Senha incorreta! Acesso negado."); }
+            } else { openEditor(id); }
+        }
+
+        function openCategorySheet() {
+            let html = categories.map(c => `<div class="sheet-item" onclick="selectCategory('${c}')"><i class="fa-solid fa-tag"></i> ${c}</div>`).join("");
+            html += `<div class="sheet-item" style="color: var(--primary)" onclick="addNewCategoryTrigger()"><i class="fa-solid fa-plus"></i> Nova Categoria</div>`;
+            openSheet("Escolher Categoria", html);
+        }
+
+        function selectCategory(cat) {
+            document.getElementById('chip-category').innerText = `Categoria: ${cat}`;
+            closeSheet();
+            saveCurrentText();
+        }
+
+        function addNewCategoryTrigger() {
+            closeSheet();
+            setTimeout(() => {
+                let name = prompt("Nome da nova categoria:");
+                if(name) { categories.push(name); selectCategory(name); }
+            }, 300);
+        }
+
+        function openEmotionSheet() {
+            let html = emotions.map(e => `<div class="sheet-item" onclick="selectEmotion('${e}')"><i class="fa-regular fa-face-smile"></i> ${e}</div>`).join("");
+            html += `<div class="sheet-item" style="color: var(--primary)" onclick="addNewEmotionTrigger()"><i class="fa-solid fa-plus"></i> Novo Sentimento</div>`;
+            openSheet("Escolher Sentimento", html);
+        }
+
+        function selectEmotion(emo) {
+            document.getElementById('chip-emotion').innerText = `Mood: ${emo}`;
+            closeSheet();
+            saveCurrentText();
+        }
+
+        function addNewEmotionTrigger() {
+            closeSheet();
+            setTimeout(() => {
+                let name = prompt("Nome do novo sentimento:");
+                if(name) { emotions.push(name); selectEmotion(name); }
+            }, 300);
+        }
+
+        function openFontTypeListSheet() {
+            const fonts = ['sans-serif', 'serif', 'Playfair Display', 'Lora', 'Courier Prime', 'Poppins'];
+            let html = fonts.map(f => `<div class="sheet-item" style="font-family: ${f};" onclick="selectFontType('${f}')">${f}</div>`).join("");
+            openSheet("Escolha uma Fonte", html);
+        }
+
+        function selectFontType(fontName) {
+            textarea.style.fontFamily = fontName;
+            closeSheet();
+            addLog(`Mudou fonte do editor para ${fontName}`);
+            showNotification(`Fonte alterada para: ${fontName}`);
+        }
+
+        function openFontSizeListSheet() {
+            const sizes = [
+                { name: 'Pequeno', value: '14px' },
+                { name: 'Padrão', value: '18px' },
+                { name: 'Médio', value: '20px' },
+                { name: 'Grande', value: '24px' },
+                { name: 'Extra Grande', value: '28px' }
+            ];
+            let html = sizes.map(s => `<div class="sheet-item" style="font-size: ${s.value};" onclick="selectFontSize('${s.value}')">${s.name}</div>`).join("");
+            openSheet("Tamanho da Letra", html);
+        }
+
+        function selectFontSize(sizeValue) {
+            textarea.style.fontSize = sizeValue;
+            closeSheet();
+            addLog(`Mudou tamanho do texto para ${sizeValue}`);
+            showNotification(`Tamanho alterado!`);
+        }
+
+        function askDeleteConfirmation() {
+            const targetId = currentId || selectedItemIdForMenu;
+            if(!targetId) return;
+
+            const item = items.find(i => i.id === targetId);
+            const title = item ? item.title : "este rascunho";
+
+            document.getElementById('popIconContainer').className = "center-popup-icon danger";
+            document.getElementById('popIconContainer').innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            document.getElementById('popInspirationTitle').innerText = "Confirmar Exclusão";
+            document.getElementById('popInspirationBody').innerText = `Tem certeza que deseja excluir "${title}" e enviá-lo para a lixeira?`;
+            
+            document.getElementById('popActionButtons').innerHTML = `
+                <button class="center-popup-btn close" onclick="closeInspirationPopup()">Não</button>
+                <button class="center-popup-btn danger-btn" onclick="executeTextDeletion(${targetId})">Sim</button>
+            `;
+            document.getElementById('inspirationPopupOverlay').classList.add('active');
+        }
+
+        function executeTextDeletion(targetId) {
+            closeInspirationPopup();
+            const itemIdx = items.findIndex(i => i.id === targetId);
+            if (itemIdx > -1) {
+                const deletedItem = items.splice(itemIdx, 1)[0];
+                trashItems.push(deletedItem);
+                addLog(`Moveu "${deletedItem.title}" para a lixeira`);
+                saveToStorage();
+                showNotification("Movido para a lixeira!", "fa-trash-can");
+            }
+            currentId = null;
+            selectedItemIdForMenu = null;
+            switchView('view-home');
+        }
+
+        function restoreFromTrash(id) {
+            const idx = trashItems.findIndex(i => i.id === id);
+            if(idx > -1) {
+                const restored = trashItems.splice(idx, 1)[0];
+                items.push(restored);
+                addLog(`Restaurou "${restored.title}" da lixeira`);
+                saveToStorage();
+                showNotification(`"${restored.title}" restaurado!`);
+            }
+        }
+
+        function deletePermanentFromTrash(id) {
+            if(confirm("Deseja apagar permanentemente? Não será possível recuperar.")) {
+                const idx = trashItems.findIndex(i => i.id === id);
+                if(idx > -1) {
+                    const permanentlyDeleted = trashItems.splice(idx, 1)[0];
+                    addLog(`Apagou permanentemente do sistema o arquivo "${permanentlyDeleted.title}"`);
+                    saveToStorage();
+                    showNotification("Apagado permanentemente.", "fa-circle-xmark");
+                }
+            }
+        }
+
+        function triggerInspirationPopup(title, content) {
+            selectedInspirationText = content;
+            document.getElementById('popIconContainer').className = "center-popup-icon";
+            document.getElementById('popIconContainer').innerHTML = `<i class="fa-regular fa-lightbulb"></i>`;
+            document.getElementById('popInspirationTitle').innerText = title;
+            document.getElementById('popInspirationBody').innerText = `"${content}"`;
+            document.getElementById('popActionButtons').innerHTML = `
+                <button class="center-popup-btn close" onclick="closeInspirationPopup()">Fechar</button>
+                <button class="center-popup-btn action" onclick="copyInspirationContent()">Copiar</button>
+            `;
+            document.getElementById('inspirationPopupOverlay').classList.add('active');
+        }
+
+        function closeInspirationPopup() {
+            document.getElementById('inspirationPopupOverlay').classList.remove('active');
+        }
+
+        function copyInspirationContent() {
+            navigator.clipboard.writeText(selectedInspirationText);
+            closeInspirationPopup();
+            showNotification("Copiado!", "fa-copy");
+        }
+
+        function pushState() {
+            if (blockHistoryPush) return;
+            if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== textarea.value) {
+                undoStack.push(textarea.value);
+                redoStack = [];
+            }
+        }
+
+        function undoAction() {
+            if (undoStack.length > 1) {
+                blockHistoryPush = true;
+                let current = undoStack.pop();
+                redoStack.push(current);
+                textarea.value = undoStack[undoStack.length - 1];
+                blockHistoryPush = false;
+                showNotification("Desfeito ↶");
+            } else if (undoStack.length === 1) {
+                blockHistoryPush = true;
+                let current = undoStack.pop();
+                redoStack.push(current);
+                textarea.value = "";
+                blockHistoryPush = false;
+                showNotification("Desfeito ↶");
+            }
+        }
+
+        function redoAction() {
+            if (redoStack.length > 0) {
+                blockHistoryPush = true;
+                let state = redoStack.pop();
+                undoStack.push(state);
+                textarea.value = state;
+                blockHistoryPush = false;
+                showNotification("Refeito ↷");
+            }
+        }
+
+        function insertChord(chord) {
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, startPos) + " " + chord + " " + textarea.value.substring(endPos, textarea.value.length);
+            pushState();
+            textarea.focus();
+        }
+
+        function openNewEditor() {
+            currentId = Date.now();
+            document.getElementById('editTitle').value = "";
+            textarea.value = "";
+            document.getElementById('chip-category').innerText = "Categoria: Geral";
+            document.getElementById('chip-emotion').innerText = "Mood: Nenhum";
+            document.getElementById('mediaPreviewArea').innerHTML = "";
+            undoStack = [""];
+            redoStack = [];
+            addLog("Abriu criador para novo rascunho");
+            switchView('view-editor');
+        }
+
+        function openEditor(id) {
+            const item = items.find(i => i.id === id);
+            if(item) {
+                currentId = item.id;
+                document.getElementById('editTitle').value = item.title;
+                textarea.value = item.content;
+                document.getElementById('chip-category').innerText = `Categoria: ${item.category || 'Geral'}`;
+                document.getElementById('chip-emotion').innerText = `Mood: ${item.emotion || 'Nenhum'}`;
+                document.getElementById('mediaPreviewArea').innerHTML = "";
+                undoStack = [item.content];
+                redoStack = [];
+                addLog(`Abriu editor para "${item.title}"`);
+                switchView('view-editor');
+            }
+        }
+
+        function saveCurrentText() {
+            if(!currentId) return;
+            const title = document.getElementById('editTitle').value || "Sem título";
+            const content = textarea.value;
+            const categoryText = document.getElementById('chip-category').innerText.replace("Categoria: ", "");
+            const emotionText = document.getElementById('chip-emotion').innerText.replace("Mood: ", "");
+            
+            const existingIndex = items.findIndex(i => i.id === currentId);
+            const type = categoryText.includes("Música") || categoryText.includes("Pop") || categoryText.includes("Rock") ? "Música" : "Poema";
+
+            if(existingIndex > -1) {
+                items[existingIndex].title = title;
+                items[existingIndex].content = content;
+                items[existingIndex].category = categoryText;
+                items[existingIndex].emotion = emotionText;
+                items[existingIndex].type = type;
+            } else {
+                if(title.trim() !== "Sem título" || content.trim() !== "") {
+                    items.push({ id: currentId, title, content, type, category: categoryText, emotion: emotionText, favorite: false, password: null });
+                    addLog(`Salvou novo rascunho: "${title}"`);
+                }
+            }
+            saveToStorage();
+        }
+
+        function toggleBold() { textarea.style.fontWeight = textarea.style.fontWeight === 'bold' ? 'normal' : 'bold'; }
+        function toggleItalic() { textarea.style.fontStyle = textarea.style.fontStyle === 'italic' ? 'normal' : 'italic'; }
+        function alignText(mode) { textarea.style.textAlign = mode; }
+        function insertList(pfx) { textarea.value += "\n" + pfx; pushState(); textarea.focus(); }
+        function enterFocusMode() { document.getElementById('appContainer').classList.add('focus-mode'); }
+        function exitFocusMode() { document.getElementById('appContainer').classList.remove('focus-mode'); }
+
+        function imageSelected(input) {
+            if(input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('mediaPreviewArea').innerHTML += `<img src="${e.target.result}" class="img-preview">`;
+                    showNotification("Imagem carregada!");
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function handleAudioRecording() {
+            const statusLabel = document.getElementById('mic-status');
+            const btn = document.getElementById('btnRecordAudio');
+            
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = []; 
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        
+                        const audioHTML = `
+                            <div class="audio-preview-badge">
+                                <i class="fa-solid fa-microphone"></i> 
+                                <audio controls src="${audioUrl}" style="height: 25px; width: 200px; margin-left: 10px;"></audio>
+                            </div>
+                        `;
+                        
+                        document.getElementById('mediaPreviewArea').insertAdjacentHTML('beforeend', audioHTML);
+                        showNotification("Áudio gravado!");
+                    });
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    statusLabel.innerHTML = `<span class="recording-pulse"></span> Gravando...`;
+                    btn.innerHTML = "<i class='fa-solid fa-stop'></i> Parar Gravação";
+                } catch (err) { 
+                    showNotification("Sem acesso ao Microfone", "fa-circle-xmark"); 
+                    console.error("Erro:", err);
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                statusLabel.innerHTML = "Gravador de Voz";
+                btn.innerHTML = "<i class='fa-solid fa-microphone'></i> Gravar Ideia de Áudio";
+            }
+        }
+
+        function toggleFavorite(id) {
+            const idx = items.findIndex(i => i.id === id);
+            if(idx > -1) {
+                items[idx].favorite = !items[idx].favorite;
+                addLog(`Modificou favoritismo de "${items[idx].title}"`);
+                saveToStorage();
+                showNotification(items[idx].favorite ? "Favoritado! ★" : "Removido dos favoritos.");
+            }
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            closeAllSubmenus();
+            if(viewId === 'view-history-log') renderLogsList();
+            if(viewId === 'view-trash') renderTrashList();
+        }
+
+        function switchNav(element, viewId) {
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            element.classList.add('active');
+            switchView(viewId);
+        }
+
+        function toggleSubmenu(id) {
+            const menu = document.getElementById(id);
+            const open = menu.style.display === 'flex';
+            closeAllSubmenus();
+            if(!open) menu.style.display = 'flex';
+        }
+
+        function closeAllSubmenus() { document.querySelectorAll('.editor-submenu').forEach(m => m.style.display = 'none'); }
+
+        renderLists();
+        renderTrashList();
+        renderLogsList();
+    </script>
+</body>
+</html>
